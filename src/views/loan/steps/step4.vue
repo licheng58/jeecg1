@@ -1,0 +1,1285 @@
+<template>
+  <div class="page-task-report">
+    <h1>贷款调查报告</h1>
+    <div v-for="(item, index) in fieldList" :key="index" class="b-line">
+      <PageTitle :title="item.name" fontSize="16px" style="padding: 0 13px"> </PageTitle>
+      <template v-if="item.name === '三、投资人情况'">
+        <step4CustomerOtherInfos
+          v-for="(item, index) of customerOtherInfos"
+          :key="`${index}`"
+          :ref="`step4CustomerOtherInfos${index}`"
+          :record="item"
+        ></step4CustomerOtherInfos>
+      </template>
+      <step4Card :ref="`step4Card${index}`" :fieldList="item.childFieldList"></step4Card>
+
+      <template v-if="item.name === '四、贷款申请情况'">
+        <step4OtherInfoList
+          v-for="(item, index) of otherInfos"
+          :key="`${index}`"
+          :ref="`step4OtherInfoList${index}`"
+          :type="2"
+          :record="item"
+        ></step4OtherInfoList>
+      </template>
+    </div>
+  </div>
+</template>
+<script>
+import { filterObj } from '@/utils/util.js'
+import {
+  customerType,
+  ifTypes,
+  ifTypes2,
+  zjType,
+  gdType,
+  jycdsyq,
+  ygrs,
+  dtzjl,
+  sqwz,
+  szcsdf,
+  ssppgsmc,
+  ppfzjd,
+  kxyt,
+} from '@/utils/dictionary'
+
+import { ywbz } from '@/utils/dictionary'
+import pick from 'lodash.pick'
+import moment from 'moment'
+import { mapGetters } from 'vuex'
+import step4OtherInfoList from './step4OtherInfoList'
+import step4CustomerOtherInfos from './step4CustomerOtherInfos'
+
+import step4Card from './step4Card'
+
+export default {
+  components: {
+    step4Card,
+    step4OtherInfoList,
+    step4CustomerOtherInfos,
+  },
+  data() {
+    return {
+      fieldList: [
+        {
+          name: '一、门店基础情况',
+          childFieldList: [
+            {
+              name: '是否为新开业门店',
+              code: 'ifNew',
+              type: 3,
+              types: ifTypes,
+              span: 8,
+              rules: { rules: [{ required: true, message: '请选择是否为新开业门店!' }] },
+              required: true,
+            },
+            {
+              name: '门店编号',
+              code: 'code',
+              type: 1,
+              span: 8,
+              rules: { rules: [{ required: true, message: '请输入门店编号!' }] },
+              required: true,
+            },
+            {
+              name: '加盟酒店店名',
+              code: 'jmjddm',
+              type: 1,
+              span: 8,
+              rules: { rules: [{ required: true, whitespace: true, message: '请输入加盟酒店店名!' }] },
+              required: true,
+            },
+
+            {
+              name: '工商注册名称',
+              code: 'gszcmc',
+              type: 1,
+              span: 8,
+              rules: { rules: [{ required: true, whitespace: true, message: '请输入工商注册名称!' }] },
+              required: true,
+            },
+            {
+              name: '门店开业时间',
+              code: 'mdkysj',
+              type: 4,
+              span: 8,
+              rules: { rules: [{ required: true, message: '请选择门店开业时间!' }] },
+              required: true,
+            },
+            {
+              name: '门店所属品牌',
+              code: 'mdsspp',
+              type: 6,
+              dictCode: 'brand_types',
+              span: 8,
+              rules: { rules: [{ required: true, message: '请选择门店所属品牌!' }] },
+              required: true,
+            },
+            {
+              name: '品牌发展阶段',
+              code: 'ppfzjd',
+              type: 1,
+              span: 8,
+              rules: { rules: [{ required: true, message: '请选择品牌发展阶段!' }] },
+              required: true,
+            },
+            {
+              name: '统一社会信用代码',
+              code: 'tyshxydm',
+              type: 1,
+              span: 8,
+              rules: {
+                rules: [
+                  { required: true, whitespace: true, message: '请输入统一社会信用代码!' },
+                  { validator: this.tyshxydmValidator },
+                ],
+              },
+              required: true,
+            },
+
+            {
+              name: '注册资本',
+              code: 'zczb',
+              type: 1,
+              inputType: 'number',
+              span: 8,
+              rules: { rules: [{ required: true, message: '请输入注册资本!' }] },
+              required: true,
+              unit: '万元',
+            },
+            {
+              name: '注册币种',
+              code: 'zcbz',
+              type: 2,
+              types: ywbz,
+              span: 8,
+              rules: { rules: [{ required: true, message: '请输入注册币种!' }] },
+              required: true,
+            },
+            {
+              name: '经营范围',
+              code: 'jyfw',
+              type: 1,
+              span: 16,
+              rules: { rules: [{ required: true, whitespace: true, message: '请输入经营范围!' }] },
+              required: true,
+            },
+            {
+              name: '营业执照成立日期',
+              code: 'yyqxqsr',
+              type: 4,
+              span: 8,
+              rules: { rules: [{ required: true, message: '请选择营业期限登记日!' }] },
+              required: true,
+            },
+            {
+              name: '营业期限到期日',
+              code: 'yyqxdqr',
+              type: 7,
+              span: 16,
+              rules: { rules: [{ required: true, message: '请选择营业期限到期日!' }] },
+              required: true,
+            },
+
+            {
+              name: '基本账户开户银行',
+              code: 'jbzhkhyh',
+              type: 1,
+              span: 8,
+              rules: {},
+              required: false,
+            },
+            {
+              name: '基本账户开户名称',
+              code: 'jbzhkhmc',
+              type: 1,
+              span: 8,
+              rules: {},
+              required: false,
+            },
+            {
+              name: '基本账户开户账号',
+              code: 'jbzhkhzh',
+              type: 1,
+              span: 8,
+              rules: {},
+              required: false,
+            },
+            {
+              name: '特种行业许可证号',
+              code: 'txhyxkzh',
+              type: 1,
+              span: 8,
+              rules: {},
+              required: false,
+            },
+            {
+              name: '特种行业许可证有效期',
+              code: 'txhyxkyxq',
+              type: 7,
+              span: 16,
+              rules: {},
+              required: false,
+            },
+            {
+              name: '是否涉诉',
+              code: 'sfss',
+              type: 3,
+              types: ifTypes2,
+              span: 8,
+              rules: { rules: [{ required: true, message: '请选择是否涉诉!' }] },
+              required: true,
+            },
+            {
+              name: '是否有征信疑问',
+              code: 'sfyzxyw',
+              type: 3,
+              types: ifTypes2,
+              span: 16,
+              rules: { rules: [{ required: true, message: '请选择是否有征信疑问!' }] },
+              required: true,
+            },
+            {
+              name: '征信疑问说明',
+              code: 'zxywsm',
+              type: 1,
+              span: 24,
+              rules: {},
+              required: false,
+            },
+            {
+              name: '法定代表人姓名',
+              code: 'xm',
+              type: 1,
+              span: 8,
+              rules: { rules: [{ required: true, whitespace: true, message: '请输入法定代表人姓名!' }] },
+              required: true,
+            },
+
+            {
+              name: '证件类型',
+              code: 'zjlx',
+              type: 2,
+              types: zjType,
+              span: 8,
+              rules: { rules: [{ required: true, message: '请选择证件类型!' }] },
+              required: true,
+            },
+            {
+              name: '证件号码',
+              code: 'zjhm',
+              type: 1,
+              span: 8,
+              rules: {
+                rules: [{ required: true, message: '请输入证件号码!' }, { validator: this.zjhmValidator }],
+              },
+              required: true,
+            },
+            {
+              name: '法人是否涉诉',
+              code: 'frsfss',
+              type: 3,
+              types: ifTypes2,
+              span: 8,
+              rules: { rules: [{ required: true, message: '请选择法人是否涉诉!' }] },
+              required: true,
+            },
+            {
+              name: '法人是否有征信疑问',
+              code: 'frsfyzxyw',
+              type: 3,
+              types: ifTypes2,
+              span: 16,
+              rules: { rules: [{ required: true, message: '请选择法人是否有征信疑问!' }] },
+              required: true,
+            },
+            {
+              name: '法人征信疑问说明',
+              code: 'frzxywsm',
+              type: 1,
+              span: 24,
+              rules: {},
+              required: false,
+            },
+            {
+              name: '加盟协议起始时间',
+              code: 'jmxyqssj',
+              type: 4,
+              span: 8,
+              rules: { rules: [{ required: true, message: '请选择加盟协议起始时间!' }] },
+              required: true,
+            },
+            {
+              name: '加盟协议终止时间',
+              code: 'jmxyqzzsj',
+              type: 4,
+              span: 8,
+              rules: { rules: [{ required: true, message: '请选择加盟协议终止时间!' }] },
+              required: true,
+            },
+            {
+              name: '过往合作期限',
+              code: 'gwhzqix',
+              filter: { code: 'ifNew', value: '0' },
+              type: 1,
+              inputType: 'number',
+              span: 8,
+              rules: { rules: [{ required: true, message: '请输入过往合作期限!' }] },
+              required: true,
+              unit: '年',
+            },
+            {
+              name: '历史加盟违约次数',
+              code: 'lsjmwycs',
+              filter: { code: 'ifNew', value: '0' },
+              type: 1,
+              inputType: 'number',
+              span: 8,
+              rules: { rules: [{ required: true, message: '请输入历史加盟违约次数!' }] },
+              required: true,
+            },
+            {
+              name: '已加盟酒店数量',
+              code: 'yjmjdsl',
+              filter: { code: 'ifNew', value: '0' },
+              type: 1,
+              inputType: 'number',
+              span: 8,
+              rules: { rules: [{ required: true, message: '请输入已加盟酒店数量!' }] },
+              required: true,
+            },
+            {
+              name: '物业地址',
+              code: 'wydz',
+              type: 5,
+              span: 8,
+              rules: { rules: [{ required: true, message: '请选择物业地址!' }] },
+              required: true,
+            },
+            {
+              name: '物业情况',
+              code: 'wyqk',
+              type: 2,
+              types: jycdsyq,
+              span: 8,
+              rules: { rules: [{ required: true, message: '请选择物业情况!' }] },
+              required: true,
+            },
+            {
+              name: '年租金',
+              code: 'nzj',
+              type: 1,
+              inputType: 'number',
+              span: 8,
+              rules: { rules: [{ required: true, message: '请输入年租金!' }] },
+              required: true,
+              unit: '万元',
+            },
+            {
+              name: '物业建筑面积',
+              code: 'wymj',
+              type: 1,
+              inputType: 'number',
+              span: 8,
+              rules: { rules: [{ required: true, message: '请输入物业面积!' }] },
+              required: true,
+              unit: '平米',
+            },
+            {
+              name: '客房数',
+              code: 'kfs',
+              type: 1,
+              inputType: 'number',
+              span: 8,
+              rules: { rules: [{ required: true, message: '请输入客房数!' }] },
+              required: true,
+              unit: '间',
+            },
+            {
+              name: '员工人数',
+              code: 'ygrs',
+              type: 1,
+              inputType: 'number',
+              span: 8,
+              rules: { rules: [{ required: true, message: '请选择员工人数!' }] },
+              required: true,
+              unit: '人',
+            },
+            {
+              name: '交通便利度',
+              code: 'jtbld',
+              type: 2,
+              types: dtzjl,
+              span: 8,
+              rules: { rules: [{ required: true, message: '请选择交通便利度!' }] },
+              required: true,
+            },
+            {
+              name: '商圈发展程度',
+              code: 'sqfzcd',
+              type: 2,
+              types: sqwz,
+              span: 8,
+              rules: { rules: [{ required: true, message: '请选择商圈发展程度!' }] },
+              required: true,
+            },
+            {
+              name: '城市级别',
+              code: 'csjb',
+              type: 2,
+              types: szcsdf,
+              span: 8,
+              rules: { rules: [{ required: true, message: '请选择城市级别!' }] },
+              required: true,
+            },
+            {
+              name: '可控营收资金比例',
+              code: 'kkyszjbl',
+              type: 1,
+              inputType: 'number',
+              span: 8,
+              rules: { rules: [{ required: true, message: '请输入可控营收资金比例!' }] },
+              required: true,
+              unit: '%',
+            },
+            {
+              name: '是否有过往酒店投资历史',
+              filter: { code: 'ifNew', value: '1' },
+              code: 'ifygjdtzls',
+              type: 3,
+              types: ifTypes2,
+              span: 8,
+              rules: { rules: [{ required: true, whitespace: true, message: '请选择是否有过往酒店投资历史!' }] },
+              required: true,
+            },
+            {
+              name: '自筹资金率',
+              code: 'zczjl',
+              filter: { code: 'ifNew', value: '1' },
+              type: 1,
+              inputType: 'number',
+              span: 16,
+              rules: { rules: [{ required: true, message: '请输入自筹资金率!' }] },
+              required: true,
+              unit: '%',
+            },
+            {
+              name: '门店联系人',
+              code: 'mdlxr',
+              type: 1,
+              span: 8,
+              rules: { rules: [{ required: true, whitespace: true, message: '请输入门店联系人!' }] },
+              required: true,
+            },
+            {
+              name: '门店联系方式',
+              code: 'mdlxfs',
+              type: 1,
+              span: 16,
+              rules: {
+                rules: [{ required: true, message: '请输入门店联系方式!' }, { validator: this.phoneValidator }],
+              },
+              required: true,
+            },
+            {
+              name: '品牌联系人',
+              code: 'pplxr',
+              type: 1,
+              span: 8,
+              rules: { rules: [{ required: true, whitespace: true, message: '请输入品牌联系人!' }] },
+              required: true,
+            },
+            {
+              name: '品牌联系方式',
+              code: 'pplxfs',
+              type: 1,
+              span: 16,
+              rules: {
+                rules: [{ required: true, message: '请输入品牌联系方式!' }, { validator: this.phoneValidator }],
+              },
+              required: true,
+            },
+            {
+              name: '说明',
+              code: 'sm',
+              type: 1,
+              span: 24,
+              rules: {},
+              required: false,
+            },
+          ],
+        },
+        {
+          name: '二、门店运营情况',
+          childFieldList: [],
+          fieldList1: [
+            {
+              name: '是否为新开业门店',
+              code: 'ifNew',
+              type: 3,
+              types: ifTypes2,
+              span: 8,
+              required: true,
+            },
+            {
+              name: '当年RevPAR',
+              code: 'dnRecpar',
+              type: 1,
+              inputType: 'number',
+              span: 8,
+              required: true,
+              unit: '元',
+            },
+            {
+              name: '当年平均出租率',
+              code: 'dnpjczl',
+              type: 1, //1 input  2 select 3 radio
+              inputType: 'number',
+              span: 8,
+              required: true,
+              unit: '%',
+            },
+            {
+              name: '当年平均房价',
+              code: 'dnpjfj',
+              type: 1,
+              inputType: 'number',
+              span: 8,
+              required: true,
+              unit: '元',
+            },
+            {
+              name: '当年累计营收合计',
+              code: 'dnljyshj',
+              type: 1,
+              inputType: 'number',
+              span: 8,
+              required: true,
+              unit: '元',
+            },
+            {
+              name: '租金占营收比',
+              code: 'zjzysb',
+              type: 1,
+              inputType: 'number',
+              span: 8,
+              required: true,
+              unit: '%',
+            },
+            {
+              name: '当年客房营收合计',
+              code: 'dnkfyshj',
+              type: 1,
+              inputType: 'number',
+              span: 8,
+              required: true,
+              unit: '元',
+            },
+            {
+              name: '当年餐饮营收合计',
+              code: 'dncyyshj',
+              type: 1,
+              inputType: 'number',
+              span: 8,
+              required: true,
+              unit: '元',
+            },
+
+            {
+              name: '当年其他营收合计',
+              code: 'dnqtyshj',
+              type: 1,
+              inputType: 'number',
+              span: 8,
+              required: true,
+              unit: '元',
+            },
+            {
+              name: '前一自然年度营业收入',
+              code: 'qyzrndyshj',
+              type: 1,
+              inputType: 'number',
+              span: 8,
+              required: true,
+              unit: '元',
+            },
+            {
+              name: '前二自然年度营业收入',
+              code: 'qezrndyshj',
+              type: 1,
+              inputType: 'number',
+              span: 8,
+              required: false,
+              unit: '元',
+            },
+            {
+              name: '前三自然年度营业收入',
+              code: 'qszrndyshj',
+              type: 1,
+              inputType: 'number',
+              span: 8,
+              required: false,
+              unit: '元',
+            },
+            {
+              name: '前一自然年度平均房价',
+              code: 'qyzrndpjfj',
+              type: 1,
+              inputType: 'number',
+              span: 8,
+              required: false,
+              unit: '元',
+            },
+            {
+              name: '前二自然年度平均房价',
+              code: 'qezrndpjfj',
+              type: 1,
+              inputType: 'number',
+              span: 8,
+              required: false,
+              unit: '元',
+            },
+            {
+              name: '前三自然年度平均房价',
+              code: 'qszrndpjfj',
+              type: 1,
+              inputType: 'number',
+              span: 8,
+              required: false,
+              unit: '元',
+            },
+            {
+              name: '前一自然年度RevPAR',
+              code: 'qyzrnrecpar',
+              type: 1,
+              inputType: 'number',
+              span: 8,
+              required: true,
+              unit: '元',
+            },
+            {
+              name: '前二自然年度RevPAR',
+              code: 'qezrnrecpar',
+              type: 1,
+              span: 8,
+              inputType: 'number',
+              required: false,
+              unit: '元',
+            },
+            {
+              name: '前三自然年度RevPAR',
+              code: 'qszrnrecpar',
+              type: 1,
+              span: 8,
+              inputType: 'number',
+              required: false,
+              unit: '元',
+            },
+            {
+              name: '前一自然年度平均出租率',
+              code: 'qyzrnpjczl',
+              type: 1,
+              inputType: 'number',
+              span: 8,
+              required: false,
+              unit: '%',
+            },
+            {
+              name: '前二自然年度平均出租率',
+              code: 'qezrnpjczl',
+              type: 1,
+              inputType: 'number',
+              span: 8,
+              required: false,
+              unit: '%',
+            },
+            {
+              name: '前三自然年度平均出租率',
+              code: 'qszrnpjczl',
+              type: 1,
+              inputType: 'number',
+              span: 8,
+              required: false,
+              unit: '%',
+            },
+            {
+              name: '备注',
+              code: 'remake',
+              type: 1,
+              span: 24,
+              required: false,
+            },
+          ],
+          fieldList2: [
+            {
+              name: '是否为新开业门店',
+              code: 'ifNew',
+              type: 3,
+              types: ifTypes2,
+              span: 8,
+              required: true,
+            },
+            {
+              name: '当年平均房价',
+              code: 'dnpjfj',
+              type: 1,
+              inputType: 'number',
+              span: 8,
+              required: true,
+              unit: '元',
+            },
+            {
+              name: '当年RevPAR',
+              code: 'dnRecpar',
+              type: 1,
+              inputType: 'number',
+              span: 8,
+              required: true,
+              unit: '元',
+            },
+            {
+              name: '当年平均出租率',
+              code: 'dnpjczl',
+              type: 1, //1 input  2 select 3 radio
+              inputType: 'number',
+              span: 8,
+              required: true,
+            },
+            {
+              name: '当年累计营收合计',
+              code: 'dnljyshj',
+              type: 1,
+              inputType: 'number',
+              span: 8,
+              required: true,
+              unit: '元',
+            },
+            {
+              name: '租金占营收比',
+              code: 'zjzysb',
+              type: 1,
+              inputType: 'number',
+              span: 8,
+              required: true,
+              unit: '%',
+            },
+            {
+              name: '当年客房营收合计',
+              code: 'dnkfyshj',
+              type: 1,
+              inputType: 'number',
+              span: 8,
+              required: true,
+              unit: '元',
+            },
+            {
+              name: '当年餐饮营收合计',
+              code: 'dncyyshj',
+              type: 1,
+              inputType: 'number',
+              span: 8,
+              required: true,
+              unit: '元',
+            },
+            {
+              name: '当年其他营收合计',
+              code: 'dnqtyshj',
+              type: 1,
+              inputType: 'number',
+              span: 8,
+              required: true,
+              unit: '元',
+            },
+            {
+              name: '后一自然年度预测营业收入',
+              code: 'hyzrndyshj',
+              type: 1,
+              span: 8,
+              inputType: 'number',
+              required: true,
+              unit: '元',
+            },
+            {
+              name: '后二自然年度预测营业收入',
+              code: 'hezrndyshj',
+              type: 1,
+              inputType: 'number',
+              span: 8,
+              required: false,
+              unit: '元',
+            },
+            {
+              name: '后三自然年度预测营业收入',
+              code: 'hszrndyshj',
+              type: 1,
+              inputType: 'number',
+              span: 8,
+              required: false,
+              unit: '元',
+            },
+            {
+              name: '后一自然年度预测平均房价',
+              code: 'hyzrndpjfj',
+              type: 1,
+              inputType: 'number',
+              span: 8,
+              required: false,
+              unit: '元',
+            },
+            {
+              name: '后二自然年度预测平均房价',
+              code: 'hezrndpjfj',
+              type: 1,
+              inputType: 'number',
+              span: 8,
+              required: false,
+              unit: '元',
+            },
+            {
+              name: '后三自然年度预测平均房价',
+              code: 'hszrndpjfj',
+              type: 1,
+              inputType: 'number',
+              span: 8,
+              required: false,
+              unit: '元',
+            },
+            {
+              name: '后一自然年度预测RevPAR',
+              code: 'hyzrnrecpar',
+              type: 1,
+              span: 8,
+              inputType: 'number',
+              required: false,
+              unit: '元',
+            },
+
+            {
+              name: '后二自然年度预测RevPAR',
+              code: 'hezrnrecpar',
+              type: 1,
+              inputType: 'number',
+              span: 8,
+              required: false,
+              unit: '元',
+            },
+            {
+              name: '后三自然年度预测RevPAR',
+              code: 'hszrnrecpar',
+              type: 1,
+              inputType: 'number',
+              span: 8,
+              required: false,
+              unit: '元',
+            },
+            {
+              name: '后一自然年度预测平均出租率',
+              code: 'hyzrnpjczl',
+              type: 1,
+              span: 8,
+              inputType: 'number',
+              required: false,
+              unit: '%',
+            },
+            {
+              name: '后二自然年度预测平均出租率',
+              code: 'hezrnpjczl',
+              type: 1,
+              inputType: 'number',
+              span: 8,
+              required: false,
+              unit: '%',
+            },
+            {
+              name: '后三自然年度预测平均出租率',
+              code: 'hszrnpjczl',
+              type: 1,
+              inputType: 'number',
+              span: 8,
+              required: false,
+              unit: '%',
+            },
+            {
+              name: '备注',
+              code: 'remake',
+              type: 1,
+              span: 24,
+              required: false,
+            },
+          ],
+        },
+        {
+          name: '三、投资人情况',
+        },
+        {
+          name: '四、贷款申请情况',
+          childFieldList: [
+            {
+              name: '门店编号',
+              code: 'code',
+              type: 1, //1 input  2 select 3 radio
+              span: 8,
+              rules: { rules: [{ required: true, message: '请输入门店编号!' }] },
+              required: true,
+            },
+            {
+              name: '加盟酒店店名',
+              code: 'jmjddm',
+              type: 1,
+              span: 8,
+              rules: { rules: [{ required: true, message: '请输入加盟酒店店名!' }] },
+              required: true,
+            },
+            {
+              name: '客户类型',
+              code: 'customerType',
+              type: 2,
+              types: customerType,
+              span: 8,
+              rules: { rules: [{ required: true, message: '请输入客户类型!' }] },
+              required: true,
+            },
+            {
+              name: '主借人',
+              code: 'zjr',
+              type: 1,
+              span: 8,
+              rules: { rules: [{ required: true, message: '请输入主借人!' }] },
+              required: true,
+            },
+            {
+              name: '证件号码',
+              code: 'zjhm',
+              type: 1,
+              span: 8,
+              rules: { rules: [{ required: true, message: '请输入证件号码!' }] },
+              required: true,
+            },
+            {
+              name: '企业征信贷款余额',
+              code: 'mddkye',
+              type: 1,
+              inputType: 'number',
+              span: 8,
+              rules: {},
+              required: false,
+              unit: '万元',
+            },
+            {
+              name: '锦江系贷款余额',
+              code: 'jjdkye',
+              type: 1,
+              inputType: 'number',
+              span: 8,
+              rules: {},
+              required: false,
+              unit: '万元',
+            },
+            {
+              name: '大股东征信贷款余额',
+              code: 'dgddkye',
+              filter: { code: 'zjlx', value: '1' },
+              hidden: true,
+              type: 1,
+              inputType: 'number',
+              span: 8,
+              rules: {},
+              required: false,
+              unit: '万元',
+            },
+            {
+              name: '大股东锦江系贷款余额',
+              code: 'jjxdkye',
+              filter: { code: 'zjlx', value: '1' },
+              type: 1,
+              inputType: 'number',
+              hidden: true,
+              span: 8,
+              rules: {},
+              required: false,
+              unit: '万元',
+            },
+            {
+              name: '申请金额',
+              code: 'amount',
+              inputType: 'number',
+              type: 1,
+              span: 8,
+              rules: { rules: [{ required: true, message: '请输入申请金额(万)!' }] },
+              required: true,
+              unit: '万元',
+            },
+
+            {
+              name: '申请期限',
+              code: 'qx',
+              inputType: 'number',
+              type: 1,
+              span: 8,
+              rules: { rules: [{ required: true, message: '请输入申请期限(月)!' }] },
+              required: true,
+              unit: '月',
+            },
+
+            {
+              name: '是否异地贷款',
+              code: 'isYddk',
+              type: 3,
+              types: ifTypes,
+              span: 8,
+              rules: { rules: [{ required: true, message: '请选择是否异地贷款!' }] },
+              required: true,
+            },
+
+            {
+              name: '款项用途',
+              code: 'kxyt',
+              type: 2,
+              types: kxyt,
+              span: 8,
+              rules: { rules: [{ required: true, message: '请选择款项用途!' }] },
+              required: true,
+            },
+            {
+              name: '还款来源',
+              code: 'hkly',
+              type: 1,
+              span: 8,
+              rules: { rules: [{ required: true, message: '请输入还款来源!' }] },
+              required: true,
+            },
+            {
+              name: '已支付加盟费',
+              code: 'yzfjmf',
+              filter: { code: 'kxyt', value: '3' },
+              inputType: 'number',
+              type: 1,
+              span: 8,
+              rules: { rules: [{ required: true, message: '请输入已支付加盟费!' }] },
+              required: true,
+              unit: '万元',
+            },
+            {
+              name: '已支付租金',
+              code: 'yzfzj',
+              inputType: 'number',
+              filter: { code: 'kxyt', value: '3' },
+              type: 1,
+              span: 8,
+              rules: { rules: [{ required: true, message: '请输入已支付租金!' }] },
+              required: true,
+              unit: '万元',
+            },
+            {
+              name: '装修投资预算',
+              code: 'zxtzys',
+              inputType: 'number',
+              filter: { code: 'kxyt', value: '3' },
+              type: 1,
+              span: 8,
+              rules: { rules: [{ required: true, message: '请输入装修投资预算!' }] },
+              required: true,
+              unit: '万元',
+            },
+            {
+              name: '单房造价',
+              code: 'dfzj',
+              inputType: 'number',
+              filter: { code: 'kxyt', value: '3' },
+              type: 1,
+              span: 8,
+              rules: { rules: [{ required: true, message: '请输入单房造价!' }] },
+              required: true,
+              unit: '万元',
+            },
+            {
+              name: '装修总进度',
+              code: 'zxzjd',
+              inputType: 'number',
+              filter: { code: 'kxyt', value: '3' },
+              type: 1,
+              span: 8,
+              rules: { rules: [{ required: true, message: '请输入装修总进度!' }] },
+              required: true,
+              unit: '%',
+            },
+            {
+              name: 'EBITDA',
+              code: 'ebitda',
+              inputType: 'number',
+              filter: { code: 'kxyt', value: '3' },
+              type: 1,
+              span: 8,
+              rules: { rules: [{ required: true, message: '请输入EBITDA!' }] },
+              required: true,
+              unit: '万元/年',
+            },
+            {
+              name: 'EBITDA率',
+              code: 'ebitdal',
+              inputType: 'number',
+              filter: { code: 'kxyt', value: '3' },
+              type: 1,
+              span: 8,
+              rules: { rules: [{ required: true, message: '请输入EBITDA率!' }] },
+              required: true,
+              unit: '%',
+            },
+            // {
+            //   name: '偿债保障比率',
+            //   code: 'czbzbl',
+            //   inputType: 'number',
+            //   filter: { code: 'kxyt', value: '3' },
+            //   type: 1,
+            //   span: 8,
+            //   rules: { rules: [{ required: true, message: '请输入EBITDA率!' }] },
+            //   required: true,
+            //   unit: '%',
+            // },
+
+            {
+              name: '备注',
+              code: 'remake',
+              type: 1,
+              span: 24,
+              rules: {},
+              required: false,
+            },
+          ],
+        },
+        {
+          name: '五、贷款产品',
+          childFieldList: [
+            {
+              name: '合作方名称',
+              code: 'partnerName',
+              type: 1, //1 input  2 select 3 radio
+              span: 8,
+              required: true,
+            },
+            {
+              name: '合作方产品',
+              code: 'partnerProName',
+              type: 1,
+              span: 8,
+              required: true,
+            },
+            {
+              name: '业务品种',
+              code: 'ywpz',
+              type: 1,
+              span: 8,
+              required: true,
+            },
+            {
+              name: '业务币种',
+              code: 'ywbz',
+              type: 1,
+              span: 8,
+              required: true,
+            },
+            {
+              name: '额度上限',
+              code: 'amountMax',
+              type: 1,
+              span: 8,
+              required: true,
+              unit: '万元',
+            },
+            {
+              name: '贷款利率',
+              code: 'll',
+              type: 1,
+              span: 8,
+              required: true,
+              unit: '%',
+            },
+            {
+              name: '贷款期限',
+              code: 'dkqx',
+              type: 1,
+              span: 8,
+              required: true,
+              unit: '月',
+            },
+            {
+              name: '计息方式',
+              code: 'jxfs',
+              type: 1,
+              span: 8,
+              required: true,
+            },
+            {
+              name: '还款方式',
+              code: 'hkfs',
+              type: 1,
+              span: 8,
+              required: true,
+            },
+          ],
+        },
+      ],
+      model: {},
+      otherInfos: [],
+      customerOtherInfos: [],
+      loading: false,
+    }
+  },
+  created() {},
+  methods: {
+    init(result) {
+      //一、门店基础情况
+      if (result.xcustomerInfo) {
+        this.fieldList[0].childFieldList = this.fieldList[0].childFieldList.filter(
+          (item) => !item.filter || item.filter.value === result.xcustomerInfo[item.filter.code]
+        )
+        this.fieldList[0].childFieldList[4].name = result.xcustomerInfo['ifNew'] === '0' ? '门店开业时间' : '预计开业时间'
+      }
+      if (result.xcustomerOperationStatus) {
+        this.fieldList[1].childFieldList =
+          result.xcustomerOperationStatus.ifNew === '1' ? this.fieldList[1].fieldList2 : this.fieldList[1].fieldList1
+      }
+      if (result.xtask) {
+        this.fieldList[3].childFieldList[5].name =
+          result.xtask.customerType === '1' ? '个人征信贷款余额' : '企业征信贷款余额'
+        this.fieldList[3].childFieldList[21].span = result.xtask.zjlx === '2' && result.xtask.kxyt === '3' ? 16 : 24
+        this.fieldList[3].childFieldList[13].span = result.xtask.zjlx === '1' && result.xtask.kxyt !== '3' ? 16 : 8
+        this.fieldList[3].childFieldList = this.fieldList[3].childFieldList.filter(
+          (item) => !item.filter || item.filter.value === result.xtask[item.filter.code]
+        )
+      }
+      this.$nextTick(() => {
+        this.otherInfos = result.otherInfos
+        this.customerOtherInfos = result.customerOtherInfos
+        this.$refs.step4Card0[0].init(result.xcustomerInfo)
+        this.$refs.step4Card1[0].init(result.xcustomerOperationStatus)
+        this.$refs.step4Card3[0].init(result.xtask)
+        this.$refs.step4Card4[0].init(result.xtask)
+      })
+    },
+  },
+}
+</script>
+<style lang="less">
+.page-task-report {
+  position: relative;
+  border: 1px solid #e5e5e5;
+  margin: 0 16px 49px;
+  h1 {
+    margin: 16px auto;
+    text-align: center;
+    font-size: 24px;
+    font-family: PingFangSC-Semibold, PingFang SC;
+    font-weight: 600;
+    color: #202b3b;
+    line-height: 33px;
+  }
+  .no-line {
+    border-left: none;
+    border-bottom: none;
+  }
+  .b-line {
+    border-bottom: 1px solid #e5e5e5;
+  }
+}
+</style>

@@ -1,0 +1,345 @@
+.standard-table-container {
+  display: block;
+  margin: 0;
+  padding: 0 24px;
+
+  .table-container-header {
+    display: block;
+
+    .header-title {
+      display: inline-block;
+      position: relative;
+      width: 100%;
+
+      // &::before {
+      //   content      : '';
+      //   display      : block;
+      //   width        : 4px;
+      //   height       : 24px;
+      //   background   : #09acf2;
+      //   border-radius: 3px;
+      //   position     : absolute;
+      //   top          : 50%;
+      //   left         : -8px;
+      //   margin-top   : -12px;
+      // }
+
+      .header-right {
+        float: right;
+
+        & > * {
+          margin-right: 8px;
+        }
+      }
+
+      &::after {
+        visibility: hidden;
+        display: block;
+        font-size: 0;
+        content: ' ';
+        clear: both;
+        height: 0;
+      }
+    }
+
+    .header-search {
+      display: inline-block;
+      width: 100%;
+    }
+  }
+
+  .table-title-count {
+    font-size: 14px;
+    font-family: PingFangSC-Regular, PingFang SC;
+    font-weight: 400;
+    color: #737373;
+    line-height: 32px;
+
+    .sum {
+      color: #f0a100;
+    }
+
+    .count {
+      color: #4664b4;
+    }
+  }
+
+  .table-title-sum {
+    font-size: 16px;
+    font-family: PingFangSC-Semibold, PingFang SC;
+    font-weight: 600;
+    color: #333333;
+    line-height: 32px;
+
+    .sum {
+      color: #f0a100;
+      margin-right: 50px;
+    }
+  }
+
+  .standard-table {
+    .ant-table-body {
+      margin: 0 !important;
+
+      .ant-table-thead > tr {
+        background: #f5f7fa;
+        border-radius: 4px 4px 0px 0px;
+
+        & > th {
+          font-size: 16px;
+          font-family: PingFangSC-Medium, PingFang SC;
+          font-weight: 500;
+          color: #333333;
+          line-height: 22px;
+          padding: 14px 8px !important;
+          background: none !important;
+        }
+      }
+    }
+
+    .ant-table-tbody tr {
+      td {
+        font-size: 14px;
+        font-family: PingFangSC-Regular, PingFang SC;
+        font-weight: 400;
+        color: #8a8a8a;
+        line-height: 22px;
+        padding: 14px 8px !important;
+      }
+    }
+  }
+
+  .ant-table-pagination {
+    width: 100%;
+    text-align: right;
+
+    .ant-pagination-total-text {
+      float: left;
+      font-size: 14px;
+      font-weight: 400;
+      color: rgba(92, 97, 101, 1);
+    }
+  }
+}
+
+.filter-select .ant-select-selection--multiple {
+  min-height: 88px;
+}
+
+.fr {
+  float: right;
+}
+
+.fl {
+  float: left;
+}
+
+.clearfix::after {
+  visibility: hidden;
+  display: block;
+  font-size: 0;
+  content: ' ';
+  clear: both;
+  height: 0;
+}
+
+.my-collapse {
+  &.m024 {
+    margin: 0 24px;
+  }
+}
+
+.my-descriptions-form {
+  margin: 0 24px 16px;
+  border-bottom: 1px solid #e5e5e5;
+  border-left: 1px solid #e5e5e5;
+  background: #ffffff;
+
+  .ant-form-item {
+    width: 100%;
+    height: 50px;
+    line-height: 50px;
+    margin-bottom: 0px !important;
+    border-top: 1px solid #e5e5e5;
+    border-right: 1px solid #e5e5e5;
+
+    // &::before,
+    // &::after{
+    //   display: none;
+    // }
+    .ant-form-item-label {
+      display: inline-block;
+      height: 50px;
+      line-height: 50px;
+      width: 210px;
+      padding: 0 10px;
+      background: #f5f7fa;
+      white-space: pre-line;
+
+      label {
+        display: inline-block;
+        font-size: 14px;
+        width: 100%;
+        font-family: PingFangSC-Regular, PingFang SC;
+        font-weight: 400;
+        color: #7d7d7d;
+        line-height: 24px;
+        word-break: break-all;
+        word-wrap: break-word;
+      }
+    }
+
+    .ant-form-item-label > label::after {
+      display: none;
+    }
+
+    .ant-form-item-control-wrapper {
+      display: inline-block;
+      width: calc(100% - 212px);
+      height: 50px;
+      line-height: 50px;
+      font-family: PingFangSC-Regular, PingFang SC;
+      vertical-align: middle;
+      padding: 0 6px;
+      position: relative;
+      border: 1px solid #ffffff;
+
+      .ant-form-item-control {
+        height: 50px;
+        line-height: 50px;
+      }
+
+      .ant-select-selection,
+      input,
+      .ant-calendar-picker,
+      .ant-input-number {
+        width: 100%;
+        background: #ffffff !important;
+        border: none;
+        cursor: pointer;
+        color: #7d7d7d;
+        box-shadow: none;
+      }
+
+      .ant-radio-group {
+        width: 100%;
+        padding: 0 10px;
+      }
+
+      .ant-radio-checked .ant-radio-inner {
+        border-color: #f0a100;
+
+        &::after {
+          background-color: #f0a100;
+        }
+      }
+
+      input[disabled] {
+        cursor: not-allowed;
+      }
+
+      .ant-form-explain {
+        display: none !important;
+      }
+
+      .has-error {
+        input,
+        .ant-select {
+          border: 1px solid #f5222d;
+          border-radius: 5px;
+        }
+
+        .ant-select input {
+          border: none;
+        }
+
+        .ant-radio-wrapper,
+        .ant-checkbox-wrapper {
+          color: #f5222d;
+        }
+      }
+    }
+  }
+
+  .field-ative {
+    input,
+    .ant-cascader-picker-label,
+    .ant-select-selection-selected-value,
+    .ant-radio-group .ant-radio-wrapper span {
+      color: #ff3c1f !important;
+    }
+  }
+
+  .my-form-item {
+    .ant-form-item-label {
+      width: 300px;
+    }
+
+    .ant-form-item-control-wrapper {
+      width: calc(100% - 302px);
+    }
+  }
+}
+
+.my-descriptions-card {
+  padding: 0 24px;
+
+  .ant-descriptions-item-label {
+    width: 210px;
+    min-width: 210px;
+    max-width: 210px;
+    font-size: 14px;
+    font-family: PingFangSC-Regular, PingFang SC;
+    font-weight: 400;
+    color: #7d7d7d;
+    line-height: 22px;
+  }
+
+  .ant-descriptions-item-content {
+    padding: 0 16px;
+    vertical-align: middle;
+
+    input {
+      background: #ffffff !important;
+      border: none;
+      padding: 0 5px;
+      cursor: pointer;
+      color: #7d7d7d;
+    }
+
+    input[disabled] {
+      cursor: not-allowed;
+    }
+  }
+}
+
+.m0 {
+  margin: 0;
+}
+
+.p0 {
+  padding: 0;
+}
+
+.no-line {
+  border-bottom: none;
+}
+
+/**隐藏样式-modal确定按钮 */
+.jee-hidden {
+  display: none;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.ant-layout-sider {
+  transition: all 0.3s !important;
+}
+
+.ant-layout {
+  background-color: #172c61;
+}

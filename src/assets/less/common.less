@@ -1,0 +1,125 @@
+@import url('//at.alicdn.com/t/font_2894251_4h8aygxd8a2.css');
+
+.ant-layout-content {
+  background-color: #fff;
+}
+/*列表上方操作按钮区域*/
+.ant-card-body .table-operator {
+  margin-bottom: 8px;
+}
+
+.ant-card {
+  height: 100%;
+}
+
+/** Button按钮间距 */
+.table-operator .ant-btn {
+  margin: 0 8px 8px 0;
+}
+
+.table-operator .ant-btn-group .ant-btn {
+  margin: 0;
+}
+
+.table-operator .ant-btn-group .ant-btn:last-child {
+  margin: 0 8px 8px 0;
+}
+
+/*列表td的padding设置 可以控制列表大小*/
+.ant-table-tbody .ant-table-row td {
+  padding-top: 15px;
+  padding-bottom: 15px;
+}
+
+/*列表页面弹出modal*/
+.ant-modal-cust-warp {
+  height: 100%;
+}
+
+/*弹出modal Y轴滚动条*/
+.ant-modal-cust-warp .ant-modal-body {
+  height: calc(100% - 110px) !important;
+  overflow-y: auto;
+}
+
+/*弹出modal 先有content后有body 故滚动条控制在body上*/
+.ant-modal-cust-warp .ant-modal-content {
+  height: 90% !important;
+  overflow-y: hidden;
+}
+
+/*列表中有图片的加这个样式 参考用户管理*/
+.anty-img-wrap {
+  height: 25px;
+  position: relative;
+}
+
+.anty-img-wrap > img {
+  max-height: 100%;
+}
+
+/*列表中范围查询样式*/
+.query-group-cust {
+  width: calc(50% - 10px);
+}
+
+.query-group-split-cust:before {
+  content: '~';
+  width: 20px;
+  display: inline-block;
+  text-align: center;
+}
+
+/*erp风格子表外框padding设置*/
+.ant-card-wider-padding.cust-erp-sub-tab > .ant-card-body {
+  padding: 5px 12px;
+}
+
+/* 内嵌子表背景颜色 */
+.j-inner-table-wrapper /deep/ .ant-table-expanded-row .ant-table-wrapper .ant-table-tbody .ant-table-row {
+  background-color: #ffffff;
+}
+
+/**隐藏样式-modal确定按钮 */
+.jee-hidden {
+  display: none;
+}
+
+.ant-btn-primary:hover {
+  background-color: #4664b4;
+  border-color: #4664b4;
+}
+
+/*
+.ant-layout-content {
+  padding: 20px;
+}
+*/
+
+.ant-table-column-title {
+  font-weight: 700;
+  font-size: 18px;
+}
+
+.ant-table-tbody > tr.ant-table-row-selected td {
+  background-color: #fff;
+}
+
+.table-operator {
+  text-align: end;
+}
+
+/*
+.ant-layout {
+  background-color: #0b1946;
+}
+
+*/
+
+.one-line {
+  width: 120px;
+  text-overflow: ellipsis;
+  white-space: normal;
+  white-space: nowrap;
+  overflow: hidden;
+}

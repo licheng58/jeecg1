@@ -1,0 +1,19 @@
+@font-face {
+  font-family: "iconfont"; /* Project id 2894148 */
+  src: url('iconfont.woff2?t=1635236529665') format('woff2'),
+       url('iconfont.woff?t=1635236529665') format('woff'),
+       url('iconfont.ttf?t=1635236529665') format('truetype');
+}
+
+.iconfont {
+  font-family: "iconfont" !important;
+  font-size: 16px;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-erweima:before {
+  content: "\e642";
+}
+
